@@ -13,6 +13,34 @@ use ggez::{Context, GameResult};
 
 use super::{Object, bullet::Bullet};
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum BulletType {
+    Common,
+    SawBlade
+}
+impl Default for BulletType {
+    fn default() -> Self{
+        BulletType::Common
+    }
+}
+impl BulletType {
+    pub fn get_spr(self) -> &'static str {
+        use self::BulletType::*;
+        match self {
+            Common => "bullets/bullet",
+            SawBlade => "bullets/sawblade",
+        }
+    }
+    /// Returns whether the bullet of this are bouncy
+    pub fn bouncy(self) -> bool {
+        use self::BulletType::*;
+        match self {
+            Common => false,
+            SawBlade => true,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum FireMode {
     Automatic,
@@ -46,6 +74,8 @@ pub struct Weapon {
     pub fire_rate: f32,
     /// Time to reload a new clip/magazine
     pub reload_time: f32,
+    pub bullet_speed: f32,
+    pub bullet_type: BulletType,
     pub fire_mode: FireMode,
     pub shot_snd: Box<str>,
     pub cock_snd: Box<str>,
@@ -225,7 +255,7 @@ impl<'a> BulletMaker<'a> {
         Bullet {
             target: obj.pos + Rotation2::new(self.1) * dest,
             obj,
-            weapon: self.0
+            weapon: self.0,
         }
     }
 }

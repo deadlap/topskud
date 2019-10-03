@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult, graphics::WHITE};
 
 use crate::{
-    util::{Point2, angle_to_vec},
+    util::{Point2, angle_to_vec, angle_from_vec},
     game::{
         DELTA,
         world::{Grid, Palette},
@@ -17,7 +17,6 @@ pub struct Bullet<'a> {
     pub target: Point2,
 }
 
-const SPEED: f32 = 1200.;
 const HEADSHOT_BONUS: f32 = 1.5;
 
 impl Bullet<'_> {
@@ -34,12 +33,12 @@ impl Bullet<'_> {
     }
     #[inline]
     pub fn draw(&self, ctx: &mut Context, a: &Assets) -> GameResult<()> {
-        let img = a.get_img(ctx, "common/bullet");
+        let img = a.get_img(ctx, self.weapon.bullet_type.get_spr());
         self.obj.draw(ctx, &*img, WHITE)
     }
     pub fn update(&mut self, palette: &Palette, grid: &Grid, player: &mut Player, enemies: &mut [Enemy]) -> Hit {
         let start = self.obj.pos;
-        let d_pos = SPEED * DELTA * angle_to_vec(self.obj.rot);
+        let d_pos = self.weapon.bullet_speed * DELTA * angle_to_vec(self.obj.rot);
 
         if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
             let hs = self.apply_damage(&mut player.health, player.obj.pos);
@@ -53,7 +52,21 @@ impl Bullet<'_> {
         }
         let cast = grid.ray_cast(palette, start, d_pos, true);
         self.obj.pos = cast.into_point();
-        if cast.full() {
+
+        if self.weapon.bullet_type.bouncy() {
+            // to_wall er en vektor fra bulletens nuværende position til dér, hvor den vil ramme væggen.
+            if let Some(to_wall) = cast.half_vec() {
+                //
+                let clip = cast.clip();
+                self.obj.pos += clip -  2. * clip.dot(&to_wall)/to_wall.norm_squared() * to_wall;
+                let vel = d_pos / DELTA;
+                self.obj.rot = angle_from_vec(vel - 2. * vel.dot(&to_wall)/to_wall.norm_squared() * to_wall);
+            }
+            
+            // Hvis bulleten er bouncy, rammer den aldrig en væg.
+            Hit::None
+        } else if cast.full() {
+            // Hvis castet er fuldt, har den ikke ramt noget
             Hit::None
         } else {
             Hit::Wall

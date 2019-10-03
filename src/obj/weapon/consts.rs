@@ -1,4 +1,4 @@
-use super::{FireMode, Weapon};
+use super::{BulletType, FireMode, Weapon};
 
 use lazy_static::lazy_static;
 
@@ -19,6 +19,10 @@ lazy_static!{
     };
 }
 
+const fn default_speed() -> f32 {
+    1200.
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct WeaponTemplate {
     name: Box<str>,
@@ -28,6 +32,10 @@ pub struct WeaponTemplate {
     penetration: f32,
     fire_rate: f32,
     reload_time: f32,
+    #[serde(default = "default_speed")]
+    bullet_speed: f32,
+    #[serde(default)]
+    bullet_type: BulletType,
     fire_mode: FireMode,
     shot_snd: Box<str>,
     cock_snd: Option<Box<str>>,
@@ -52,6 +60,8 @@ impl WeaponTemplate {
             penetration,
             fire_rate,
             reload_time,
+            bullet_speed,
+            bullet_type,
             fire_mode,
             shot_snd,
             cock_snd,
@@ -71,6 +81,8 @@ impl WeaponTemplate {
             damage,
             penetration,
             fire_rate,
+            bullet_speed,
+            bullet_type,
             reload_time,
             fire_mode,
             shot_snd,
