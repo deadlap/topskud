@@ -211,7 +211,7 @@ impl GameState for Play {
         let mut deads = Vec::new();
         for (i, bullet) in self.world.bullets.iter_mut().enumerate().rev() {
             let hit = bullet.update(&self.world.palette, &self.world.grid, &mut self.world.player, &mut *self.world.enemies);
-            
+
             use crate::obj::bullet::Hit;
 
             match hit {
@@ -244,7 +244,9 @@ impl GameState for Play {
                     }
                 }
                 Hit::Enemy(e, hs) => {
-                    deads.push(i);
+                    if !bullet.weapon.bullet_type.bouncy() {
+                        deads.push(i);
+                    }
                     let enemy = &self.world.enemies[e];
                     s.mplayer.play(ctx, if hs {"ding"} else {"hit"})?;
 
@@ -459,7 +461,7 @@ impl GameState for Play {
                 if let Some(wep) = &mut self.world.player.wep {
                     wep.reload(ctx, &mut s.mplayer).unwrap()
                 } else {
-                    self.world.bullets.push(Bullet{obj: self.world.player.obj.clone(), weapon: &weapon::WEAPONS["glock"], target: self.world.player.obj.pos});
+                    self.world.bullets.push(Bullet::new(self.world.player.obj.clone(), &weapon::WEAPONS["glock"], self.world.player.obj.pos));
                 }
             },
             Key(F) => {

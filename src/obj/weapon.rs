@@ -252,10 +252,7 @@ impl<'a> BulletMaker<'a> {
         let dest = target - obj.pos;
 
         obj.rot += self.1;
-        Bullet {
-            target: obj.pos + Rotation2::new(self.1) * dest,
-            obj,
-            weapon: self.0,
-        }
+        let target = obj.pos + Rotation2::new(self.1) * dest;
+        Bullet::new(obj, self.0, target)
     }
 }
