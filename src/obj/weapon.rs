@@ -16,7 +16,8 @@ use super::{Object, bullet::Bullet};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum BulletType {
     Common,
-    SawBlade
+    SawBlade,
+    Laser
 }
 impl Default for BulletType {
     fn default() -> Self{
@@ -29,6 +30,7 @@ impl BulletType {
         match self {
             Common => "bullets/bullet",
             SawBlade => "bullets/sawblade",
+            Laser => "bullets/laser1",
         }
     }
     /// Returns whether the bullet of this are bouncy
@@ -37,6 +39,7 @@ impl BulletType {
         match self {
             Common => false,
             SawBlade => true,
+            Laser => false,
         }
     }
 }

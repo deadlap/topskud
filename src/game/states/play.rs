@@ -428,7 +428,7 @@ impl GameState for Play {
             enemy.draw(ctx, &s.assets, WHITE)?;
         }
         for bullet in &self.world.bullets {
-            bullet.draw(ctx, &s.assets)?;
+            bullet.draw(ctx, &s.assets, &self.world.palette, &self.world.grid)?;
         }
         for grenade in &self.world.grenades {
             grenade.draw(ctx, &s.assets)?;

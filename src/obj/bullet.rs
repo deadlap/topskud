@@ -8,7 +8,7 @@ use crate::{
     },
     io::tex::{Assets, }
 };
-use super::{Object, player::Player, enemy::Enemy, health::Health, weapon::Weapon};
+use super::{Object, player::Player, enemy::Enemy, health::Health, weapon::{Weapon, BulletType}};
 
 #[derive(Debug, Clone)]
 pub struct Bullet<'a> {
@@ -45,9 +45,28 @@ impl<'a> Bullet<'a> {
         headshot
     }
     #[inline]
-    pub fn draw(&self, ctx: &mut Context, a: &Assets) -> GameResult<()> {
-        let img = a.get_img(ctx, self.weapon.bullet_type.get_spr());
-        self.obj.draw(ctx, &*img, WHITE)
+    pub fn draw(&self, ctx: &mut Context, a: &Assets, palette: &Palette, grid: &Grid) -> GameResult<()> {
+        if let BulletType::Laser = self.weapon.bullet_type {
+            let mut bullet_obj = self.obj.clone();
+            let bullet_length = self.vel.normalize() * 8.;
+            let img = a.get_img(ctx, self.weapon.bullet_type.get_spr());
+
+            // Så længe vi ikke har ramt noget.
+            loop {
+                bullet_obj.draw(ctx, &*img, WHITE)?;
+
+                let cast = grid.ray_cast(palette, bullet_obj.pos, bullet_length, true);
+                if !cast.full() {
+                    break;
+                }
+                bullet_obj.pos = cast.into_point();
+            }
+
+            Ok(())
+        } else {
+            let img = a.get_img(ctx, self.weapon.bullet_type.get_spr());
+            self.obj.draw(ctx, &*img, WHITE)
+        }
     }
     pub fn update(&mut self, palette: &Palette, grid: &Grid, player: &mut Player, enemies: &mut [Enemy]) -> Hit {
         let start = self.obj.pos;
@@ -55,14 +74,21 @@ impl<'a> Bullet<'a> {
 
         let d_pos = DELTA * self.vel - 0.5 * DELTA * d_vel;
         self.vel -= d_vel;
+        if let BulletType::SawBlade = self.weapon.bullet_type {
+            self.obj.rot += 0.08;
+        }
         if self.vel.norm() < 375. {
             return Hit::Wall;
         }
 
+        // Tjek om kuglen rammer spilleren
+        // Da distancen kuglen rejser er et linjestykke, og spilleren er en cirkel, bruger vi `dist_line_circle`
         if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
             let hs = self.apply_damage(&mut player.health, player.obj.pos);
             return Hit::Player(hs);
         }
+        // Tjek om kuglen rammer en enemy
+        // Samme fremgangsmåde som med spilleren
         for (i, enem) in enemies.iter_mut().enumerate() {
             if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
                 if self.in_enemy.is_none() {
