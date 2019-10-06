@@ -241,6 +241,9 @@ impl Level {
     pub fn save<P: AsRef<Path>>(&self, path: P) -> GameResult<()> {
         let mut file = File::create(path)?;
 
+        writeln!(file, "PALETTE")?;
+        bincode::serialize_into(&mut file, &self.palette)
+            .map_err(|e| GameError::ResourceLoadError(format!("{:?}", e)))?;
         writeln!(file, "GRD")?;
         bincode::serialize_into(&mut file, &self.grid)
             .map_err(|e| GameError::ResourceLoadError(format!("{:?}", e)))?;

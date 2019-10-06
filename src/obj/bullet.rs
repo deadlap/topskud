@@ -17,6 +17,7 @@ pub struct Bullet<'a> {
     pub weapon: &'a Weapon,
     pub target: Point2,
     in_enemy: Option<usize>,
+    in_wall: Option<usize>,
 }
 
 const HEADSHOT_BONUS: f32 = 1.5;
@@ -31,6 +32,7 @@ impl<'a> Bullet<'a> {
             weapon,
             target,
             in_enemy: None,
+            in_wall: None,
         }
     }
     pub fn apply_damage(&self, health: &mut Health, pos: Point2) -> bool {

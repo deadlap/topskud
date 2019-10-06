@@ -38,9 +38,24 @@ fn ensure(mat: &str) {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+impl Default for MaterialProperties {
+    fn default() -> Self {
+        MaterialProperties {
+            solid: false,
+            robustness: 1.0,
+        }
+    }
+}
+#[inline(always)]
+const fn one() -> f32 {
+    1.
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 struct MaterialProperties {
     solid: bool,
+    #[serde(default = "one")]
+    robustness: f32,
 }
 
 #[inline]
@@ -57,7 +72,7 @@ pub fn get_img<'a>(ctx: &mut Context, assets: &'a Assets, mat: &str) -> Ref<'a, 
     assets.get_img(ctx, &MATS.read().unwrap()[mat].spr)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Palette {
     materials: Box<[&'static str]>,
 }
@@ -97,7 +112,7 @@ impl Palette {
     pub fn and(self, other: &Self) -> Self {
         let Palette{materials} = self;
         let mut mats = materials.to_vec();
-        
+
         for &mat in &*other.materials {
             if !mats.contains(&mat) {
                 mats.push(mat);
