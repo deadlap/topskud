@@ -19,10 +19,6 @@ lazy_static!{
     };
 }
 
-const fn default_speed() -> f32 {
-    1200.
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct WeaponTemplate {
     name: Box<str>,
@@ -32,20 +28,38 @@ pub struct WeaponTemplate {
     penetration: f32,
     fire_rate: f32,
     reload_time: f32,
-    #[serde(default = "default_speed")]
-    bullet_speed: f32,
     #[serde(default)]
     bullet_type: BulletType,
     fire_mode: FireMode,
     shot_snd: Box<str>,
-    cock_snd: Option<Box<str>>,
-    reload_snd: Option<Box<str>>,
+    #[serde(default = "def_cock")]
+    cock_snd: Box<str>,
+    #[serde(default = "def_reload")]
+    reload_snd: Box<str>,
     click_snd: Box<str>,
-    impact_snd: Option<Box<str>>,
+    #[serde(default = "def_impact")]
+    impact_snd: Box<str>,
     entity_sprite: Box<str>,
     spray_pattern: Vec<f32>,
     spray_decay: f32,
     spray_repeat: usize,
+    #[serde(default = "def_speed")]
+    bullet_speed: f32,
+}
+#[inline]
+const fn def_speed() -> f32 {
+    1200.
+}
+fn def_cock() -> Box<str> {
+    "cock".into()
+}
+#[inline]
+fn def_reload() -> Box<str> {
+    "reload".into()
+}
+#[inline]
+fn def_impact() -> Box<str> {
+    "impact".into()
 }
 
 const DEG2RAD: f32 = PI / 180.;
@@ -86,10 +100,10 @@ impl WeaponTemplate {
             reload_time,
             fire_mode,
             shot_snd,
-            cock_snd: cock_snd.unwrap_or_else(|| "cock".into()),
-            reload_snd: reload_snd.unwrap_or_else(|| "reload".into()),
+            cock_snd,
+            reload_snd,
             click_snd,
-            impact_snd: impact_snd.unwrap_or_else(|| "impact".into()),
+            impact_snd,
             hands_sprite: (entity_sprite.to_string() + "_hands").into(),
             entity_sprite,
             spray_pattern: spray_pattern.into_iter().map(|deg| deg * DEG2RAD).collect(),

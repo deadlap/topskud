@@ -77,7 +77,6 @@ pub struct Weapon {
     pub fire_rate: f32,
     /// Time to reload a new clip/magazine
     pub reload_time: f32,
-    pub bullet_speed: f32,
     pub bullet_type: BulletType,
     pub fire_mode: FireMode,
     pub shot_snd: Box<str>,
@@ -90,6 +89,7 @@ pub struct Weapon {
     pub spray_pattern: Box<[f32]>,
     pub spray_decay: f32,
     pub spray_repeat: usize,
+    pub bullet_speed: f32,
 }
 
 mod consts;
