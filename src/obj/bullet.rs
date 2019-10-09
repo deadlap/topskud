@@ -17,7 +17,7 @@ pub struct Bullet<'a> {
     pub weapon: &'a Weapon,
     pub target: Point2,
     in_enemy: Option<usize>,
-    in_wall: Option<usize>,
+    in_wall: Option<u8>,
 }
 
 const HEADSHOT_BONUS: f32 = 1.5;
@@ -73,7 +73,6 @@ impl<'a> Bullet<'a> {
     pub fn update(&mut self, palette: &Palette, grid: &Grid, player: &mut Player, enemies: &mut [Enemy]) -> Hit {
         let start = self.obj.pos;
         let d_vel = BULLET_DECCELERATION * DELTA * angle_to_vec(self.obj.rot);
-
         let d_pos = DELTA * self.vel - 0.5 * DELTA * d_vel;
         self.vel -= d_vel;
         if let BulletType::SawBlade = self.weapon.bullet_type {
@@ -82,7 +81,6 @@ impl<'a> Bullet<'a> {
         if self.vel.norm() < 375. {
             return Hit::Wall;
         }
-
         // Tjek om kuglen rammer spilleren
         // Da distancen kuglen rejser er et linjestykke, og spilleren er en cirkel, bruger vi `dist_line_circle`
         if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
@@ -104,7 +102,33 @@ impl<'a> Bullet<'a> {
                 }
             }
         }
+        // Grid::is_solid(grid, palette, bx, by)
+        // self.in_wall = None;
         let cast = grid.ray_cast(palette, start, d_pos, true);
+        if !self.weapon.bullet_type.bouncy() {
+            let (bx,by) = Grid::snap(start+d_pos);
+            let r_mat = Grid::get(grid, bx, by);
+            let (nx,ny) = Grid::snap(start);
+            let n_mat = Grid::get(grid, nx, ny);
+            if !cast.full(){
+                if Grid::is_solid(grid, palette, bx, by) {
+                    self.in_wall = r_mat;
+                } else if Grid::is_solid(grid, palette, nx, ny) {
+                    self.in_wall = n_mat;
+                } else {
+                    self.in_wall = None;
+                }
+            }
+            if self.in_wall.is_some() {
+                let rob_mat = palette.get_robust(self.in_wall.unwrap());
+                let mat_req = (self.vel.norm()*(1.0-rob_mat) / self.weapon.bullet_speed)*self.weapon.penetration;
+                if rob_mat <= mat_req {
+                    self.vel *= 1.0-rob_mat;
+                    self.obj.pos += d_pos;
+                    return Hit::None
+                }
+            }
+        }
         self.obj.pos = cast.into_point();
 
         if self.weapon.bullet_type.bouncy() {

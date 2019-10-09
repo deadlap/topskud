@@ -64,6 +64,12 @@ pub fn is_solid(mat: &str) -> bool {
 
     MATS.read().unwrap()[mat].props.solid
 }
+#[inline]
+pub fn get_robust(mat: &str) -> f32 {
+    ensure(mat);
+
+    MATS.read().unwrap()[mat].props.robustness
+}
 
 #[inline]
 pub fn get_img<'a>(ctx: &mut Context, assets: &'a Assets, mat: &str) -> Ref<'a, Image> {
@@ -131,6 +137,10 @@ impl Palette {
     }
     pub fn is_solid(&self, i: u8) -> bool {
         is_solid(self.materials[i as usize])
+    }
+    #[inline]
+    pub fn get_robust(&self, i: u8) -> f32 {
+        get_robust(self.materials[i as usize])
     }
     #[inline]
     pub fn get(&self, i: u8) -> Option<&str> {
