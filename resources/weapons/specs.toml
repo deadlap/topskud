@@ -160,10 +160,10 @@ spray_repeat = 2
 [auto_laser]
 name = "Auto-Laser"
 clip_size = 200
-clips = 8
-damage = 5.5
+clips = 6
+damage = 8.5
 penetration = 0.15
-fire_rate = 0.05
+fire_rate = 0.10
 reload_time = 1.95
 bullet_type = "Laser"
 bullet_speed = 2200.0

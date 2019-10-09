@@ -217,7 +217,7 @@ impl GameState for Play {
                     }
                 }
                 Hit::Enemy(e, hs) => {
-                    if !bullet.weapon.bullet_type.bouncy() {
+                    if !bullet.weapon.bullet_type.piercing() {
                         deads.push(i);
                     }
                     let enemy = &self.world.enemies[e];

@@ -42,6 +42,14 @@ impl BulletType {
             Laser => false,
         }
     }
+    pub fn piercing(self) -> bool {
+        use self::BulletType::*;
+        match self {
+            Common => false,
+            SawBlade => true,
+            Laser => false,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]

@@ -102,8 +102,6 @@ impl<'a> Bullet<'a> {
                 }
             }
         }
-        // Grid::is_solid(grid, palette, bx, by)
-        // self.in_wall = None;
         let cast = grid.ray_cast(palette, start, d_pos, true);
         if !self.weapon.bullet_type.bouncy() {
             let (bx,by) = Grid::snap(start+d_pos);
@@ -123,7 +121,7 @@ impl<'a> Bullet<'a> {
                 let rob_mat = palette.get_robust(self.in_wall.unwrap());
                 let mat_req = (self.vel.norm()*(1.0-rob_mat) / self.weapon.bullet_speed)*self.weapon.penetration;
                 if rob_mat <= mat_req {
-                    self.vel *= 1.0-rob_mat;
+                    self.vel *= 1.0-(1.0-self.weapon.penetration)*rob_mat;//1.0-rob_mat;
                     self.obj.pos += d_pos;
                     return Hit::None
                 }
