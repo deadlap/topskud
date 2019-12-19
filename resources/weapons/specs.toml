@@ -120,8 +120,8 @@ bullet_speed = 3200
 
 [sawblade_launcher]
 name = "Sawblade launcher"
-clip_size = 2
-clips = 4
+clip_size = 3
+clips = 5
 damage = 37.5
 penetration = 0.35
 fire_rate = 0.45
@@ -139,7 +139,7 @@ spray_repeat = 2
 
 
 [laser_rifle]
-name = "Semi-Auto Laser Rifle"
+name = "Semi-Automatic Laser Rifle"
 clip_size = 6
 clips = 8
 damage = 75.5
@@ -149,7 +149,7 @@ reload_time = 1.95
 bullet_type = "Laser"
 bullet_speed = 2200.0
 fire_mode = "SemiAutomatic"
-shot_snd = "Boom"
+shot_snd = "boom"
 cock_snd = "cock2"
 click_snd = "click_uzi"
 entity_sprite = "weapons/laser_rifle"
@@ -159,19 +159,20 @@ spray_repeat = 2
 
 [auto_laser]
 name = "Auto-Laser"
-clip_size = 200
+clip_size = 150
 clips = 6
-damage = 8.5
-penetration = 0.15
-fire_rate = 0.10
-reload_time = 1.95
+damage = 12.5
+penetration = 0.1
+fire_rate = 0.05
+reload_time = 5.95
 bullet_type = "Laser"
-bullet_speed = 2200.0
+bullet_speed = 9000.0
 fire_mode = "Automatic"
-shot_snd = "Boom"
+shot_snd = "boom"
 cock_snd = "cock2"
 click_snd = "click_uzi"
 entity_sprite = "weapons/auto_laser"
-spray_pattern = [-0.5, 0.5, 0.75, -0.75]
+# spray_pattern = [-0.5, 0.5, 0.75, -0.75,]
+spray_pattern = [-3.3, -4.2, 3.0, -3.0, 3.0, -2.0, 4.0, -3.0, -2.0, 3.0]
 spray_decay = 0.53
-spray_repeat = 2
+spray_repeat = 4
