@@ -30,6 +30,8 @@ pub struct WeaponTemplate {
     reload_time: f32,
     #[serde(default)]
     bullet_type: BulletType,
+    #[serde(default = "def_amount")]
+    bullet_amount: u16,
     fire_mode: FireMode,
     shot_snd: Box<str>,
     #[serde(default = "def_cock")]
@@ -49,6 +51,10 @@ pub struct WeaponTemplate {
 #[inline]
 const fn def_speed() -> f32 {
     1200.
+}
+#[inline]
+const fn def_amount() -> u16 {
+    1
 }
 fn def_cock() -> Box<str> {
     "cock".into()
@@ -76,6 +82,7 @@ impl WeaponTemplate {
             reload_time,
             bullet_speed,
             bullet_type,
+            bullet_amount,
             fire_mode,
             shot_snd,
             cock_snd,
@@ -97,6 +104,7 @@ impl WeaponTemplate {
             fire_rate,
             bullet_speed,
             bullet_type,
+            bullet_amount,
             reload_time,
             fire_mode,
             shot_snd,

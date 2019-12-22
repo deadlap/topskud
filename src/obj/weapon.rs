@@ -16,6 +16,7 @@ use super::{Object, bullet::Bullet};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum BulletType {
     Common,
+    Shotgun,
     SawBlade,
     Laser
 }
@@ -29,6 +30,7 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => "bullets/bullet",
+            Shotgun => "bullets/bullet",
             SawBlade => "bullets/sawblade",
             Laser => "bullets/laser1",
         }
@@ -38,6 +40,7 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => false,
+            Shotgun => false,
             SawBlade => true,
             Laser => false,
         }
@@ -46,7 +49,17 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => false,
+            Shotgun => false,
             SawBlade => true,
+            Laser => false,
+        }
+    }
+    pub fn Is_Shotgun(self) -> bool {
+        use self::BulletType::*;
+        match self {
+            Common => false,
+            Shotgun => true,
+            SawBlade => false,
             Laser => false,
         }
     }
@@ -86,6 +99,7 @@ pub struct Weapon {
     /// Time to reload a new clip/magazine
     pub reload_time: f32,
     pub bullet_type: BulletType,
+    pub bullet_amount: u16,
     pub fire_mode: FireMode,
     pub shot_snd: Box<str>,
     pub cock_snd: Box<str>,
@@ -259,7 +273,7 @@ impl<'a> WeaponInstance<'a> {
 
 pub struct BulletMaker<'a>(&'a Weapon, f32);
 impl<'a> BulletMaker<'a> {
-    pub fn make(self, mut obj: Object, target: Point2) -> Bullet<'a> {
+    pub fn make(&self, mut obj: Object, target: Point2) -> Bullet<'a> {
         let dest = target - obj.pos;
 
         obj.rot += self.1;
