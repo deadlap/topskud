@@ -450,7 +450,7 @@ impl GameState for Play {
                 if let Some(wep) = &mut self.world.player.wep {
                     if let Some(bm) = wep.shoot(ctx, &mut s.mplayer).unwrap() {
                         let mut rot = self.world.player.obj.rot;
-                        let is_shotgun = wep.weapon.bullet_type.Is_Shotgun();
+                        let is_shotgun = wep.weapon.bullet_type.is_shotgun();
                         let player_angle = angle_to_vec(self.world.player.obj.rot);
                         for i in 0..wep.weapon.bullet_amount {
                             let mut spray_index = i as usize;

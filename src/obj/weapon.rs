@@ -54,7 +54,7 @@ impl BulletType {
             Laser => false,
         }
     }
-    pub fn Is_Shotgun(self) -> bool {
+    pub fn is_shotgun(self) -> bool {
         use self::BulletType::*;
         match self {
             Common => false,

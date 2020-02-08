@@ -1,26 +1,18 @@
-use gfx::{self, *};
-
 use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, DrawMode, DrawParam}};
 use std::f32::consts::PI;
 
 use crate::{
-    util::{Point2, angle_to_vec, BLUE, RED, GREEN},
+    util::{Point2, angle_to_vec},
     io::{
         snd::MediaPlayer,
         tex::{Assets, },
     },
-    game::{DELTA, world::{Grid, Palette}},
+    game::{world::{Grid, Palette}},
 };
 
 use super::{Object, health::Health, weapon::WeaponInstance, grenade::Utilities};
 
 pub const VISIBILITY: f32 = ::std::f32::consts::FRAC_PI_4;
-
-gfx_defines! {
-    constant Dim {
-        rate: f32 = "u_Rate",
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
@@ -100,7 +92,7 @@ impl Player {
         screen.push(Point2::new(lvl_width, lvl_height));
         for i in 0..(angle as u16){
             let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + i as f32)*PI/180.)*length, true);
-            let current_point = cast.into_point();
+            let current_point = cast.into_point()+angle_to_vec((start_angle + i as f32)*PI/180.)*20.;
             list_of_points.push(current_point);
             if i == 0 {fpoint = current_point;}
             if (current_point.y < pos.y || current_point.x < pos.x) && !p_added && i == 0 {
