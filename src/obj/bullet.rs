@@ -81,7 +81,9 @@ impl<'a> Bullet<'a> {
         let mut min_vel = 650.;
         if let BulletType::SawBlade = self.weapon.bullet_type{
             min_vel = 350.;
-        }
+        } else if let BulletType::Laser = self.weapon.bullet_type {
+            min_vel = 1800.;
+        } 
         if self.vel.norm() < min_vel {
             return Hit::Wall;
         }

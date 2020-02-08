@@ -390,9 +390,8 @@ impl GameState for Play {
             let img = s.assets.get_img(ctx, &wep.weapon.entity_sprite);
             graphics::draw(ctx, &*img, drawparams)?;
         }
-
+        
         self.world.player.draw_player(ctx, &s.assets)?;
-
         for enemy in &self.world.enemies {
             enemy.draw(ctx, &s.assets, WHITE)?;
         }
@@ -402,6 +401,7 @@ impl GameState for Play {
         for grenade in &self.world.grenades {
             grenade.draw(ctx, &s.assets)?;
         }
+        self.world.player.draw_visible_area(ctx, 412.,&self.world.palette, &self.world.grid)?;
 
         Ok(())
     }
