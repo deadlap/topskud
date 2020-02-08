@@ -84,12 +84,16 @@ impl Player {
         list_of_points.push(pos);
         
         let mut screen = Vec::new();
-        let mut p_added = false;
-        let mut fpoint = Point2::new(0.,0.);
+
+        let mut p_added = false; //is the player position added yet.
+        let mut fpoint = Point2::new(0.,0.); // the first point (will be changed)
+
+        // add all the corners of level to the background/fog mesh
         screen.push(Point2::new(0., lvl_height));
         screen.push(Point2::new(0., 0.));
         screen.push(Point2::new(lvl_width, 0.));
         screen.push(Point2::new(lvl_width, lvl_height));
+
         for i in 0..(angle as u16){
             let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + i as f32)*PI/180.)*length, true);
             let current_point = cast.into_point()+angle_to_vec((start_angle + i as f32)*PI/180.)*20.;
@@ -103,7 +107,7 @@ impl Player {
             screen.push(current_point);
         }
         list_of_points.push(pos);
-        screen.push(pos);        
+        screen.push(pos);
         screen.push(fpoint);
         screen.push(Point2::new(lvl_width, lvl_height));
         screen.push(Point2::new(0., lvl_height));
