@@ -274,6 +274,7 @@ impl<'a> WeaponInstance<'a> {
 
 // Weapon, jerk
 // jerk is used to adjust the target position
+#[derive(Copy, Clone)]
 pub struct BulletMaker<'a>(&'a Weapon, f32);
 impl<'a> BulletMaker<'a> {
     pub fn make(self, mut obj: Object) -> Bullet<'a> {

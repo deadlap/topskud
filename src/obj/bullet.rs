@@ -15,8 +15,8 @@ pub struct Bullet<'a> {
     pub obj: Object,
     pub vel: Vector2,
     pub weapon: &'a Weapon,
-    in_enemy: Option<usize>,
-    in_wall: Option<u8>,
+    pub in_enemy: Option<usize>,
+    pub in_wall: Option<u8>,
 }
 
 impl Bullet<'_> {
@@ -53,7 +53,7 @@ impl Bullet<'_> {
         let start = self.obj.pos;
         let d_pos = self.vel * DELTA;
 
-        let mut velocity_decrease: f32 = 650. * DELTA;
+        let mut velocity_decrease: f32 = 950. * DELTA;
 
         if let BulletType::SawBlade = self.weapon.bullet_type {
             velocity_decrease = 350. * DELTA;

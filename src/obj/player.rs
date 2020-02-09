@@ -2,7 +2,7 @@ use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, DrawMode, D
 use std::f32::consts::PI;
 
 use crate::{
-    util::{Point2, angle_to_vec},
+    util::{Point2, angle_to_vec, BLUE},
     io::{
         snd::MediaPlayer,
         tex::{Assets, },
@@ -80,9 +80,6 @@ impl Player {
         let dir2 = angle_to_vec(rot + VISIBILITY + PI/12.);
         let angle = ((dir1.angle(&dir2)*180.)/PI).floor();
         let start_angle = ((rot - VISIBILITY - PI/12.)*180.)/PI;
-        let mut list_of_points = Vec::new();
-        list_of_points.push(pos);
-        
         let mut screen = Vec::new();
 
         let mut p_added = false; //is the player position added yet.
@@ -97,7 +94,6 @@ impl Player {
         for i in 0..(angle as u16){
             let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + i as f32)*PI/180.)*length, true);
             let current_point = cast.into_point()+angle_to_vec((start_angle + i as f32)*PI/180.)*20.;
-            list_of_points.push(current_point);
             if i == 0 {fpoint = current_point;}
             if (current_point.y < pos.y || current_point.x < pos.x) && !p_added && i == 0 {
                 p_added = true;
@@ -106,17 +102,12 @@ impl Player {
             }
             screen.push(current_point);
         }
-        list_of_points.push(pos);
         screen.push(pos);
         screen.push(fpoint);
         screen.push(Point2::new(lvl_width, lvl_height));
         screen.push(Point2::new(0., lvl_height));
-        let mesh = Mesh::new_polyline(ctx, DrawMode::stroke(1.5), &list_of_points, Color::from_rgba(4, 6, 6, 245))?;
-        let mesh2 = Mesh::new_ellipse(ctx, DrawMode::stroke(1.5), pos, 80., 80., 80., Color::from_rgba(4, 6, 6, 245))?;
         let mesh_screen = Mesh::new_polygon(ctx, DrawMode::fill(), &screen, Color::from_rgba(4, 6, 6, 245))?;
-        graphics::draw(ctx, &mesh_screen, DrawParam::default())?;
-        graphics::draw(ctx, &mesh2, DrawParam::default())?;
-        graphics::draw(ctx, &mesh, DrawParam::default())
+        graphics::draw(ctx, &mesh_screen, DrawParam::default())
     }
     pub fn update(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<()> {
         if let Some(wep) = &mut self.wep {
