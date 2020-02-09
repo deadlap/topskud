@@ -2,7 +2,7 @@ use std::num::NonZeroU16;
 use std::fmt::{self, Display};
 
 use crate::{
-    util::{Point2, Rotation2},
+    util::{Point2, angle_to_vec},
     game::DELTA,
     io::{
         snd::MediaPlayer,
@@ -66,6 +66,7 @@ impl BulletType {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
 pub enum FireMode {
     Automatic,
     SemiAutomatic,
@@ -271,13 +272,20 @@ impl<'a> WeaponInstance<'a> {
     }
 }
 
+// Weapon, jerk
+// jerk is used to adjust the target position
 pub struct BulletMaker<'a>(&'a Weapon, f32);
 impl<'a> BulletMaker<'a> {
-    pub fn make(&self, mut obj: Object, target: Point2) -> Bullet<'a> {
-        let dest = target - obj.pos;
+    pub fn make(self, mut obj: Object) -> Bullet<'a> {
+        let BulletMaker(weapon, jerk) = self;
 
-        obj.rot += self.1;
-        let target = obj.pos + Rotation2::new(self.1) * dest;
-        Bullet::new(obj, self.0, target)
+        obj.rot += jerk;
+        Bullet {
+            vel: weapon.bullet_speed * angle_to_vec(obj.rot),
+            obj,
+            weapon,
+            in_enemy: None, 
+            in_wall: None,
+        }
     }
 }

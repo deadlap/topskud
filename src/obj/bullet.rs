@@ -15,36 +15,15 @@ pub struct Bullet<'a> {
     pub obj: Object,
     pub vel: Vector2,
     pub weapon: &'a Weapon,
-    pub target: Point2,
     in_enemy: Option<usize>,
     in_wall: Option<u8>,
 }
 
-const HEADSHOT_BONUS: f32 = 1.5;
-
-const BULLET_DECCELERATION: f32 = 25.7;
-
-impl<'a> Bullet<'a> {
-    pub fn new(obj: Object, weapon: &'a Weapon, target: Point2) -> Self {
-        Bullet {
-            vel: weapon.bullet_speed * angle_to_vec(obj.rot),
-            obj,
-            weapon,
-            target,
-            in_enemy: None,
-            in_wall: None,
-        }
-    }
-    pub fn apply_damage(&self, health: &mut Health, pos: Point2) -> bool {
-        let headshot = (self.target - pos).norm() <= 12.;
-        let dmg = if headshot {
-            HEADSHOT_BONUS
-        } else {
-            1.
-        } * self.weapon.damage * (self.vel.norm() / self.weapon.bullet_speed);
+impl Bullet<'_> {
+    pub fn apply_damage(&self, health: &mut Health) {
+        let dmg = self.weapon.damage * self.vel.norm() / self.weapon.bullet_speed;
 
         health.weapon_damage(dmg, self.weapon.penetration);
-        headshot
     }
     #[inline]
     pub fn draw(&self, ctx: &mut Context, a: &Assets, palette: &Palette, grid: &Grid) -> GameResult<()> {
@@ -72,21 +51,36 @@ impl<'a> Bullet<'a> {
     }
     pub fn update(&mut self, palette: &Palette, grid: &Grid, player: &mut Player, enemies: &mut [Enemy]) -> Hit {
         let start = self.obj.pos;
-        let d_vel = BULLET_DECCELERATION * DELTA * angle_to_vec(self.obj.rot);
-        let d_pos = DELTA * self.vel - 0.5 * DELTA * d_vel;
-        self.vel -= d_vel;
+        let d_pos = self.vel * DELTA;
+
+        let mut velocity_decrease: f32 = 650. * DELTA;
+
         if let BulletType::SawBlade = self.weapon.bullet_type {
+            velocity_decrease = 350. * DELTA;
             self.obj.rot += 0.08;
         }
-        let mut min_vel = 650.;
-        if let BulletType::SawBlade = self.weapon.bullet_type{
-            min_vel = 350.;
-        } else if let BulletType::Laser = self.weapon.bullet_type {
-            min_vel = 1800.;
-        } 
-        if self.vel.norm() < min_vel {
+        if self.vel.norm() < velocity_decrease {
             return Hit::Wall;
         }
+        if self.vel.norm() <= velocity_decrease {
+            return Hit::Wall;
+        }
+        // Check if we've hit a player or an enemy
+        if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
+            self.apply_damage(&mut player.health);
+            return Hit::Player;
+        }
+        for (i, enem) in enemies.iter_mut().enumerate() {
+            if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
+                self.apply_damage(&mut enem.pl.health);
+                return Hit::Enemy(i);
+            }
+        }
+
+        // Decrease velocity after damage could've been dealt
+        self.vel -= self.vel.normalize() * velocity_decrease;
+
+        // Ray cast bullet to see if we've hit a wall and move bullet accordingly
         let cast = grid.ray_cast(palette, start, d_pos, true);
         if cast.full() || self.weapon.bullet_type.bouncy() {
             self.in_wall = None;
@@ -104,17 +98,17 @@ impl<'a> Bullet<'a> {
             // Tjek om kuglen rammer spilleren
             // Da distancen kuglen rejser er et linjestykke, og spilleren er en cirkel, bruger vi `dist_line_circle`
             if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
-                let hs = self.apply_damage(&mut player.health, player.obj.pos);
-                return Hit::Player(hs);
+                self.apply_damage(&mut player.health);
+                return Hit::Player;
             }
             // Tjek om kuglen rammer en enemy
             // Samme fremgangsmåde som med spilleren
             for (i, enem) in enemies.iter_mut().enumerate() {
                 if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
                     if self.in_enemy.is_none() {
-                        let hs = self.apply_damage(&mut enem.pl.health, enem.pl.obj.pos);
+                        self.apply_damage(&mut enem.pl.health);
                         self.in_enemy = Some(i);
-                        return Hit::Enemy(i, hs);
+                        return Hit::Enemy(i);
                     }
                 } else if let Some(j) = self.in_enemy {
                     if i == j {
@@ -131,7 +125,7 @@ impl<'a> Bullet<'a> {
 
                 let clip = cast.clip();
                 self.obj.pos += clip -  2. * clip.dot(&to_wall)/to_wall.norm_squared() * to_wall;
-                self.vel -= 2. * self.vel.dot(&to_wall)/to_wall.norm_squared() * to_wall - 2. * d_vel;
+                self.vel -= 2. * self.vel.dot(&to_wall)/to_wall.norm_squared() * to_wall - 2. * self.vel;
                 self.obj.rot = angle_from_vec(self.vel);
             }
             // Hvis bulleten er bouncy, rammer den aldrig en væg.
@@ -139,7 +133,7 @@ impl<'a> Bullet<'a> {
         } else if !self.weapon.bullet_type.bouncy() && self.in_wall.is_some() {
             let material_robustness = palette.get_robust(self.in_wall.unwrap());
             self.vel*=1.-material_robustness;
-            if material_robustness <= self.weapon.penetration && self.vel.norm() >= min_vel {
+            if material_robustness <= self.weapon.penetration && self.vel.norm() >= velocity_decrease {
                 self.obj.pos += cast.clip();
                 Hit::None
             } else {
@@ -157,7 +151,7 @@ impl<'a> Bullet<'a> {
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Hit {
     Wall,
-    Player(bool),
-    Enemy(usize, bool),
+    Player,
+    Enemy(usize),
     None,
 }

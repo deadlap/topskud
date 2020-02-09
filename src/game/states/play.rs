@@ -197,10 +197,10 @@ impl GameState for Play {
                     self.holes.add(bullet.obj.drawparams());
                     deads.push(i);
                 }
-                Hit::Player(hs) => {
+                Hit::Player => {
                     deads.push(i);
                     self.world.decals.push(new_blood(bullet.obj.clone()));
-                    s.mplayer.play(ctx, if hs {"ding"} else {"hit"})?;
+                    s.mplayer.play(ctx, "hit")?;
 
                     if self.world.player.health.is_dead() {
                         s.switch(StateSwitch::Lose(Box::new(Statistics{
@@ -215,12 +215,12 @@ impl GameState for Play {
                         s.mplayer.play(ctx, "hurt")?;
                     }
                 }
-                Hit::Enemy(e, hs) => {
+                Hit::Enemy(e) => {
                     if !bullet.weapon.bullet_type.piercing() {
                         deads.push(i);
                     }
                     let enemy = &self.world.enemies[e];
-                    s.mplayer.play(ctx, if hs {"ding"} else {"hit"})?;
+                    s.mplayer.play(ctx, "hit")?;
 
                     self.world.decals.push(new_blood(bullet.obj.clone()));
                     if enemy.pl.health.is_dead() {
@@ -274,7 +274,6 @@ impl GameState for Play {
             }
         }
 
-        let mouse_pos = s.mouse - s.offset;
         // Define player velocity here already because enemies need it
         let player_vel = Vector2::new(hor(&ctx), ver(&ctx));
 
@@ -291,7 +290,7 @@ impl GameState for Play {
                         let mut bul = Object::new(pos);
                         bul.rot = enemy.pl.obj.rot;
 
-                        self.world.bullets.push(bm.make(bul, self.world.player.obj.pos));
+                        self.world.bullets.push(bm.make(bul));
                     }
                 }
             }
@@ -311,7 +310,7 @@ impl GameState for Play {
                     let mut bul = Object::new(pos);
                     bul.rot = self.world.player.obj.rot;
 
-                    self.world.bullets.push(bm.make(bul, mouse_pos));
+                    self.world.bullets.push(bm.make(bul));
                 }
             }
         }
@@ -430,7 +429,8 @@ impl GameState for Play {
                 if let Some(wep) = &mut self.world.player.wep {
                     wep.reload(ctx, &mut s.mplayer).unwrap()
                 } else {
-                    self.world.bullets.push(Bullet::new(self.world.player.obj.clone(), &weapon::WEAPONS["glock"], self.world.player.obj.pos));
+                    let weapon = &weapon::WEAPONS["glock"];
+                    self.world.bullets.push(Bullet{in_enemy: None, in_wall: None, obj: self.world.player.obj.clone(), vel: Vector2::new(weapon.bullet_speed, 0.), weapon});
                 }
             },
             Key(F) => {
@@ -465,7 +465,7 @@ impl GameState for Play {
                                 //bul.rot = self.world.player.obj.rot + wep.weapon.spray_pattern[spray_index];
                             }
                             bul.rot = rot;
-                            self.world.bullets.push(bm.make(bul, s.mouse-s.offset));
+                            self.world.bullets.push(bm.make(bul));
                         }
                     }
                 }
