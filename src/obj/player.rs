@@ -91,9 +91,9 @@ impl Player {
         screen.push(Point2::new(lvl_width, 0.));
         screen.push(Point2::new(lvl_width, lvl_height));
 
-        for i in 0..(angle as u16){
-            let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + i as f32)*PI/180.)*length, true);
-            let current_point = cast.into_point()+angle_to_vec((start_angle + i as f32)*PI/180.)*20.;
+        for i in 0..(angle as u16)/2{
+            let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*length, true);
+            let current_point = cast.into_point()+angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*15.;
             if i == 0 {fpoint = current_point;}
             if (current_point.y < pos.y || current_point.x < pos.x) && !p_added && i == 0 {
                 p_added = true;
@@ -106,7 +106,7 @@ impl Player {
         screen.push(fpoint);
         screen.push(Point2::new(lvl_width, lvl_height));
         screen.push(Point2::new(0., lvl_height));
-        let mesh_screen = Mesh::new_polygon(ctx, DrawMode::fill(), &screen, Color::from_rgba(4, 6, 6, 245))?;
+        let mesh_screen = Mesh::new_polygon(ctx, DrawMode::fill(), &screen, Color::from_rgba(4, 6, 6, 255))?;
         graphics::draw(ctx, &mesh_screen, DrawParam::default())
     }
     pub fn update(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<()> {
