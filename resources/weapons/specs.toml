@@ -137,6 +137,25 @@ spray_decay = 0.82
 spray_repeat = 5
 bullet_speed = 1140
 
+[moss_shotgun]
+name = "Mossy Shotty"
+clip_size = 8
+clips = 5
+damage = 9.6
+penetration = 0.29
+fire_rate = 0.48
+reload_time = 2.9
+fire_mode = { pumpaction = { shell_load = 11 } }
+shot_snd = "shot2"
+cock_snd = "cock_ak47"
+click_snd = "click_uzi"
+reload_snd = "reload_m4"
+entity_sprite = "weapons/shotgun"
+spray_pattern = [2.1, 3.3, 4.2, -3.0, 3.0, -3.0, 2.0, -4.0, 3.0, 2.0]
+spray_decay = 0.82
+spray_repeat = 5
+bullet_speed = 1220
+
 [sawblade_launcher]
 name = "Sawblade launcher"
 clip_size = 3

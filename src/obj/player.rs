@@ -70,15 +70,6 @@ impl Player {
         let img = a.get_img(ctx, sprite);
         self.obj.draw(ctx, &*img, color)
     }
-    // pub fn draw_shader_area(&self, ctx: &mut Context, length: f32, palette: &Palette, grid: &Grid) -> GameResult<()> {
-    //     let lvl_height = (grid.height() as f32)*32.;
-    //     let lvl_width = (grid.width() as f32)*32.;
-    //     let Object{pos, rot} = self.obj;
-    //     let dir1 = angle_to_vec(rot - VISIBILITY - PI/12.);
-    //     let dir2 = angle_to_vec(rot + VISIBILITY + PI/12.);
-    //     let angle = ((dir1.angle(&dir2)*180.)/PI).floor();
-    //     let start_angle = ((rot - VISIBILITY - PI/12.)*180.)/PI;
-    // }
     pub fn update(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<()> {
         if let Some(wep) = &mut self.wep {
             wep.update(ctx, mplayer)?;

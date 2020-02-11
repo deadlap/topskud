@@ -1,6 +1,6 @@
 [palettes]
 materials = ["grass", "wall", "floor", "dirt", "asphalt", "sand", "concrete", "wood_floor", "stairs", "wood_wall"]
-weapons = ["glock", "five_seven", "magnum", "m4a1", "ak47", "arwp","sawblade_launcher", "laser_rifle", "auto_laser"]
+weapons = ["glock", "five_seven", "magnum", "m4a1", "ak47", "moss_shotgun", "arwp","sawblade_launcher", "laser_rifle", "auto_laser"]
 decals = [
     "decorations/chair1",
     "decorations/chair2",
