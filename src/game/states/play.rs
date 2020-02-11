@@ -290,7 +290,9 @@ impl GameState for Play {
                         let mut bul = Object::new(pos);
                         bul.rot = enemy.pl.obj.rot;
 
-                        self.world.bullets.push(bm.make(bul));
+                        for bullet in bm.make(bul) {
+                            self.world.bullets.push(bullet);
+                        }
                     }
                 }
             }
@@ -310,7 +312,9 @@ impl GameState for Play {
                     let mut bul = Object::new(pos);
                     bul.rot = self.world.player.obj.rot;
 
-                    self.world.bullets.push(bm.make(bul));
+                    for bullet in bm.make(bul) {
+                        self.world.bullets.push(bullet);
+                    }
                 }
             }
         }
@@ -449,23 +453,12 @@ impl GameState for Play {
             Mouse(MouseButton::Left) | Key(Space) => {
                 if let Some(wep) = &mut self.world.player.wep {
                     if let Some(bm) = wep.shoot(ctx, &mut s.mplayer).unwrap() {
-                        let mut rot = self.world.player.obj.rot;
-                        let is_shotgun = wep.weapon.bullet_type.is_shotgun();
-                        let player_angle = angle_to_vec(self.world.player.obj.rot);
-                        for i in 0..wep.weapon.bullet_amount {
-                            let mut spray_index = i as usize;
-                            if spray_index >= wep.weapon.spray_pattern.len() {
-                                spray_index = (i as usize) - (wep.weapon.spray_pattern.len()-1);
-                            }
-                            let pos = self.world.player.obj.pos + 20. * player_angle;
-                            let mut bul = Object::new(pos);
-                            //bul.rot = self.world.player.obj.rot; //+ - ((i-1) as f32)*self.world.player.obj.rot; 
-                            if is_shotgun {
-                                rot += wep.weapon.spray_pattern[spray_index];
-                                //bul.rot = self.world.player.obj.rot + wep.weapon.spray_pattern[spray_index];
-                            }
-                            bul.rot = rot;
-                            self.world.bullets.push(bm.make(bul));
+                        let pos = self.world.player.obj.pos + 20. * angle_to_vec(self.world.player.obj.rot);
+                        let mut bul = Object::new(pos);
+                        bul.rot = self.world.player.obj.rot;
+
+                        for bullet in bm.make(bul) {
+                            self.world.bullets.push(bullet);
                         }
                     }
                 }

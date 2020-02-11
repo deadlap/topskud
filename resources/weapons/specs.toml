@@ -32,7 +32,7 @@ bullet_speed = 1200
 name = "5-SeveN"
 clip_size = 20
 clips = 5
-damage = 50.4
+damage = 52.7
 penetration = 0.46
 fire_rate = 0.20
 reload_time = 1.3
@@ -118,6 +118,25 @@ spray_decay = 1.0
 spray_repeat = 2
 bullet_speed = 3200
 
+[shotty]
+name = "M4 Shotty"
+clip_size = 6
+clips = 5
+damage = 11.3
+penetration = 0.31
+fire_rate = 0.48
+reload_time = 3.2
+fire_mode = { pumpaction = { shell_load = 7 } }
+shot_snd = "shot2"
+cock_snd = "cock_ak47"
+click_snd = "click_uzi"
+reload_snd = "reload_m4"
+entity_sprite = "weapons/m4"
+spray_pattern = [2.1, 3.3, 4.2, -3.0, 3.0, -3.0, 2.0, -4.0, 3.0, 2.0]
+spray_decay = 0.82
+spray_repeat = 5
+bullet_speed = 1140
+
 [sawblade_launcher]
 name = "Sawblade launcher"
 clip_size = 3
@@ -176,44 +195,3 @@ entity_sprite = "weapons/auto_laser"
 spray_pattern = [-1.3, -2.2, 3.4, -3.2, 2.8, -2.0, 3.0, -1.2, 1.5, -2.8]
 spray_decay = 0.43
 spray_repeat = 4
-
-
-[shotgun]
-name = "shotgun"
-clip_size = 6
-clips = 4
-damage = 9.5
-penetration = 0.08
-fire_rate = 0.56
-reload_time = 2.4
-bullet_type = "Shotgun"
-bullet_amount = 12
-fire_mode = "semiautomatic"
-shot_snd = "shot1"
-cock_snd = "cock2"
-click_snd = "click_pistol"
-entity_sprite = "weapons/shotgun"
-spray_pattern = [-1.4, 1.25, -1.3, 2.2, -3.5, 3.3, 5.3, -6.8, 4.1, -2.6, 6.8, -6.2]
-spray_decay = 0.85
-spray_repeat = 4
-bullet_speed = 1600
-
-[break_action_shotgun]
-name = "break action shotgun"
-clip_size = 2
-clips = 14
-damage = 15.2
-penetration = 0.12
-fire_rate = 0.12
-reload_time = 1.6
-bullet_type = "Shotgun"
-bullet_amount = 12
-fire_mode = "semiautomatic"
-shot_snd = "shot1"
-cock_snd = "cock2"
-click_snd = "click_pistol"
-entity_sprite = "weapons/break_action_shotgun"
-spray_pattern = [-1.3, 2.2, -3.5, 3.2, 2.6, -2.7, 0.2, -2.1, 1.4, -1.8, -0.4, 0.25]
-spray_decay = 0.85
-spray_repeat = 4
-bullet_speed = 1200

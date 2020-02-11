@@ -1,4 +1,4 @@
-use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, DrawMode, DrawParam}};
+use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, BlendMode, set_blend_mode, MeshBuilder, DrawMode, DrawParam, FillOptions}};
 use std::f32::consts::PI;
 
 use crate::{
@@ -80,17 +80,16 @@ impl Player {
         let dir2 = angle_to_vec(rot + VISIBILITY + PI/12.);
         let angle = ((dir1.angle(&dir2)*180.)/PI).floor();
         let start_angle = ((rot - VISIBILITY - PI/12.)*180.)/PI;
-        let mut screen = Vec::new();
-
+        
         let mut p_added = false; //is the player position added yet.
         let mut fpoint = Point2::new(0.,0.); // the first point (will be changed)
-
         // add all the corners of level to the background/fog mesh
+        // let mut screen = Vec::new();
+        let mut screen = Vec::new();
         screen.push(Point2::new(0., lvl_height));
         screen.push(Point2::new(0., 0.));
         screen.push(Point2::new(lvl_width, 0.));
         screen.push(Point2::new(lvl_width, lvl_height));
-
         for i in 0..(angle as u16)/2{
             let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*length, true);
             let current_point = cast.into_point()+angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*15.;
@@ -106,7 +105,7 @@ impl Player {
         screen.push(fpoint);
         screen.push(Point2::new(lvl_width, lvl_height));
         screen.push(Point2::new(0., lvl_height));
-        let mesh_screen = Mesh::new_polygon(ctx, DrawMode::fill(), &screen, Color::from_rgba(4, 6, 6, 255))?;
+        let mesh_screen = Mesh::new_polygon(ctx, DrawMode::Fill(FillOptions::even_odd()), &screen, Color::from_rgba(4, 6, 6, 255))?;
         graphics::draw(ctx, &mesh_screen, DrawParam::default())
     }
     pub fn update(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<()> {

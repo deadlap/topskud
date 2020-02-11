@@ -2,7 +2,7 @@ use std::num::NonZeroU16;
 use std::fmt::{self, Display};
 
 use crate::{
-    util::{Point2, angle_to_vec},
+    util::{Point2, angle_to_vec, Sstr},
     game::DELTA,
     io::{
         snd::MediaPlayer,
@@ -16,7 +16,6 @@ use super::{Object, bullet::Bullet};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum BulletType {
     Common,
-    Shotgun,
     SawBlade,
     Laser
 }
@@ -30,7 +29,6 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => "bullets/bullet",
-            Shotgun => "bullets/bullet",
             SawBlade => "bullets/sawblade",
             Laser => "bullets/laser1",
         }
@@ -40,7 +38,6 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => false,
-            Shotgun => false,
             SawBlade => true,
             Laser => false,
         }
@@ -49,17 +46,7 @@ impl BulletType {
         use self::BulletType::*;
         match self {
             Common => false,
-            Shotgun => false,
             SawBlade => true,
-            Laser => false,
-        }
-    }
-    pub fn is_shotgun(self) -> bool {
-        use self::BulletType::*;
-        match self {
-            Common => false,
-            Shotgun => true,
-            SawBlade => false,
             Laser => false,
         }
     }
@@ -71,8 +58,8 @@ pub enum FireMode {
     Automatic,
     SemiAutomatic,
     BoltAction,
-    PumpAction{
-        shell_load: u8,
+    PumpAction {
+        shell_load: u16,
     }
 }
 
@@ -89,7 +76,7 @@ impl FireMode {
 
 #[derive(Debug, Clone)]
 pub struct Weapon {
-    pub name: Box<str>,
+    pub name: Sstr,
     pub clip_size: NonZeroU16,
     pub clips: NonZeroU16,
     pub damage: f32,
@@ -100,15 +87,14 @@ pub struct Weapon {
     /// Time to reload a new clip/magazine
     pub reload_time: f32,
     pub bullet_type: BulletType,
-    pub bullet_amount: u16,
     pub fire_mode: FireMode,
-    pub shot_snd: Box<str>,
-    pub cock_snd: Box<str>,
-    pub reload_snd: Box<str>,
-    pub click_snd: Box<str>,
-    pub impact_snd: Box<str>,
-    pub entity_sprite: Box<str>,
-    pub hands_sprite: Box<str>,
+    pub shot_snd: Sstr,
+    pub cock_snd: Sstr,
+    pub reload_snd: Sstr,
+    pub click_snd: Sstr,
+    pub impact_snd: Sstr,
+    pub entity_sprite: Sstr,
+    pub hands_sprite: Sstr,
     pub spray_pattern: Box<[f32]>,
     pub spray_decay: f32,
     pub spray_repeat: usize,
@@ -245,6 +231,18 @@ impl<'a> WeaponInstance<'a> {
         }
         mplayer.play(ctx, &self.weapon.reload_snd)
     }
+    fn next_jerk(&mut self) -> f32 {
+        let jerk = self.jerk;
+
+        self.jerk_decay = self.weapon.spray_decay;
+        self.jerk += self.weapon.spray_pattern[self.spray_index];
+        self.spray_index += 1; 
+        if self.spray_index >= self.weapon.spray_pattern.len() {
+            self.spray_index -= self.weapon.spray_repeat;
+        }
+
+        jerk
+    }
     pub fn shoot(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<Option<BulletMaker<'a>>> {
         if self.cur_clip > 0 && self.loading_time == 0. {
             self.cur_clip -= 1;
@@ -252,17 +250,18 @@ impl<'a> WeaponInstance<'a> {
                 self.loading_time = self.weapon.fire_rate;
             }
 
-            let jerk = self.jerk;
-
-            self.jerk_decay = self.weapon.spray_decay;
-            self.jerk += self.weapon.spray_pattern[self.spray_index];
-            self.spray_index += 1; 
-            if self.spray_index >= self.weapon.spray_pattern.len() {
-                self.spray_index -= self.weapon.spray_repeat;
-            }
-
             mplayer.play(ctx, &self.weapon.shot_snd)?;
-            Ok(Some(BulletMaker(self.weapon, jerk)))
+
+            let jerks = match self.weapon.fire_mode {
+                FireMode::PumpAction{shell_load} => {
+                    (0..shell_load).map(|_| self.next_jerk()).collect()
+                },
+                _ => {
+                    vec![self.next_jerk()]
+                },
+            };
+
+            Ok(Some(BulletMaker(self.weapon, jerks)))
         } else {
             if self.cur_clip == 0 {
                 mplayer.play(ctx, &self.weapon.click_snd)?;
@@ -272,21 +271,25 @@ impl<'a> WeaponInstance<'a> {
     }
 }
 
-// Weapon, jerk
+// Weapon, jerks
 // jerk is used to adjust the target position
-#[derive(Copy, Clone)]
-pub struct BulletMaker<'a>(&'a Weapon, f32);
+pub struct BulletMaker<'a>(&'a Weapon, Vec<f32>);
 impl<'a> BulletMaker<'a> {
-    pub fn make(self, mut obj: Object) -> Bullet<'a> {
-        let BulletMaker(weapon, jerk) = self;
+    pub fn make(self, obj: Object) -> impl Iterator<Item=Bullet<'a>> {
+        let BulletMaker(weapon, jerks) = self;
 
-        obj.rot += jerk;
-        Bullet {
-            vel: weapon.bullet_speed * angle_to_vec(obj.rot),
-            obj,
-            weapon,
-            in_enemy: None, 
-            in_wall: None,
-        }
+        jerks.into_iter().map(move |jerk| {
+            let mut obj = obj.clone();
+
+            obj.rot += jerk;
+            Bullet {
+                vel: weapon.bullet_speed * angle_to_vec(obj.rot),
+                obj,
+                weapon,
+                in_enemy: None,
+                in_wall: None,
+            }
+        })
     }
 }
+
