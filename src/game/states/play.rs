@@ -404,7 +404,6 @@ impl GameState for Play {
         for grenade in &self.world.grenades {
             grenade.draw(ctx, &s.assets)?;
         }
-        self.world.player.draw_visible_area(ctx, 412.,&self.world.palette, &self.world.grid)?;
 
         Ok(())
     }
@@ -434,7 +433,7 @@ impl GameState for Play {
                     wep.reload(ctx, &mut s.mplayer).unwrap()
                 } else {
                     let weapon = &weapon::WEAPONS["glock"];
-                    self.world.bullets.push(Bullet{in_enemy: None, in_wall: None, obj: self.world.player.obj.clone(), vel: Vector2::new(weapon.bullet_speed, 0.), weapon});
+                    self.world.bullets.push(Bullet{in_enemy: None, obj: self.world.player.obj.clone(), vel: Vector2::new(weapon.bullet_speed, 0.), weapon});
                 }
             },
             Key(F) => {

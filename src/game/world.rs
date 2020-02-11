@@ -346,13 +346,6 @@ impl Grid {
     pub fn is_solid(&self, pal: &Palette, x: u16, y: u16) -> bool {
         self.get(x, y).map(|m| pal.is_solid(m)).unwrap_or(true)
     }
-    #[inline(always)]
-    pub fn get_robust_tuple(&self, pal: &Palette, (x, y): (u16, u16)) -> f32 {
-        self.get_robust(pal, x, y)
-    }
-    pub fn get_robust(&self, pal: &Palette, x: u16, y: u16) -> f32 {
-        self.get(x, y).map(|m| pal.get_robust(m)).unwrap_or(1.0)
-    }
     pub fn insert(&mut self, x: u16, y: u16, mat: u8) {
         if x < self.width {
             let i = self.idx(x, y);

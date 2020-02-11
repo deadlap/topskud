@@ -42,7 +42,6 @@ impl Default for MaterialProperties {
     fn default() -> Self {
         MaterialProperties {
             solid: false,
-            robustness: 1.0,
         }
     }
 }
@@ -54,8 +53,6 @@ const fn one() -> f32 {
 #[derive(Debug, Serialize, Deserialize)]
 struct MaterialProperties {
     solid: bool,
-    #[serde(default = "one")]
-    robustness: f32,
 }
 
 #[inline]
@@ -63,12 +60,6 @@ pub fn is_solid(mat: &str) -> bool {
     ensure(mat);
 
     MATS.read().unwrap()[mat].props.solid
-}
-#[inline]
-pub fn get_robust(mat: &str) -> f32 {
-    ensure(mat);
-
-    MATS.read().unwrap()[mat].props.robustness
 }
 
 #[inline]
@@ -137,10 +128,6 @@ impl Palette {
     }
     pub fn is_solid(&self, i: u8) -> bool {
         is_solid(self.materials[i as usize])
-    }
-    #[inline]
-    pub fn get_robust(&self, i: u8) -> f32 {
-        get_robust(self.materials[i as usize])
     }
     #[inline]
     pub fn get(&self, i: u8) -> Option<&str> {

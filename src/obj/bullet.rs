@@ -16,7 +16,6 @@ pub struct Bullet<'a> {
     pub vel: Vector2,
     pub weapon: &'a Weapon,
     pub in_enemy: Option<usize>,
-    pub in_wall: Option<u8>,
 }
 
 impl Bullet<'_> {
@@ -82,38 +81,24 @@ impl Bullet<'_> {
 
         // Ray cast bullet to see if we've hit a wall and move bullet accordingly
         let cast = grid.ray_cast(palette, start, d_pos, true);
-        if cast.full() || self.weapon.bullet_type.bouncy() {
-            self.in_wall = None;
-        } else {
-            let dir = angle_to_vec(self.obj.rot);
-            let (cur_x,cur_y) = Grid::snap(cast.into_point()+dir);
-            let cur_mat = Grid::get(grid, cur_x, cur_y);
-            if Grid::is_solid(grid, palette, cur_x, cur_y) {
-                self.in_wall = cur_mat;
-            } else {
-                self.in_wall = None;
-            }
+        // Tjek om kuglen rammer spilleren
+        // Da distancen kuglen rejser er et linjestykke, og spilleren er en cirkel, bruger vi `dist_line_circle`
+        if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
+            self.apply_damage(&mut player.health);
+            return Hit::Player;
         }
-        if self.in_wall.is_none() {
-            // Tjek om kuglen rammer spilleren
-            // Da distancen kuglen rejser er et linjestykke, og spilleren er en cirkel, bruger vi `dist_line_circle`
-            if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
-                self.apply_damage(&mut player.health);
-                return Hit::Player;
-            }
-            // Tjek om kuglen rammer en enemy
-            // Samme fremgangsmåde som med spilleren
-            for (i, enem) in enemies.iter_mut().enumerate() {
-                if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
-                    if self.in_enemy.is_none() {
-                        self.apply_damage(&mut enem.pl.health);
-                        self.in_enemy = Some(i);
-                        return Hit::Enemy(i);
-                    }
-                } else if let Some(j) = self.in_enemy {
-                    if i == j {
-                        self.in_enemy = None;
-                    }
+        // Tjek om kuglen rammer en enemy
+        // Samme fremgangsmåde som med spilleren
+        for (i, enem) in enemies.iter_mut().enumerate() {
+            if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
+                if self.in_enemy.is_none() {
+                    self.apply_damage(&mut enem.pl.health);
+                    self.in_enemy = Some(i);
+                    return Hit::Enemy(i);
+                }
+            } else if let Some(j) = self.in_enemy {
+                if i == j {
+                    self.in_enemy = None;
                 }
             }
         }
@@ -130,15 +115,6 @@ impl Bullet<'_> {
             }
             // Hvis bulleten er bouncy, rammer den aldrig en væg.
             Hit::None
-        } else if !self.weapon.bullet_type.bouncy() && self.in_wall.is_some() {
-            let material_robustness = palette.get_robust(self.in_wall.unwrap());
-            self.vel*=1.-material_robustness;
-            if material_robustness <= self.weapon.penetration && self.vel.norm() >= velocity_decrease {
-                self.obj.pos += cast.clip();
-                Hit::None
-            } else {
-                Hit::Wall
-            }
         } else if cast.full() {
             // Hvis castet er fuldt, har den ikke ramt noget
             Hit::None

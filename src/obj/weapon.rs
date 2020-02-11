@@ -287,7 +287,6 @@ impl<'a> BulletMaker<'a> {
                 obj,
                 weapon,
                 in_enemy: None,
-                in_wall: None,
             }
         })
     }
