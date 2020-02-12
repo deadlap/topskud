@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult, graphics::WHITE};
 
 use crate::{
-    util::{Point2, Vector2, angle_to_vec, angle_from_vec},
+    util::{Vector2, angle_from_vec},
     game::{
         DELTA,
         world::{Grid, Palette},

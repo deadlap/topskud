@@ -45,10 +45,6 @@ impl Default for MaterialProperties {
         }
     }
 }
-#[inline(always)]
-const fn one() -> f32 {
-    1.
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct MaterialProperties {

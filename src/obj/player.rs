@@ -1,5 +1,4 @@
-use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, DrawMode, DrawParam, FillOptions}};
-use std::f32::consts::PI;
+use ggez::{Context, GameResult, graphics::{self, WHITE, Color}};
 
 use crate::{
     util::{Point2, angle_to_vec},
@@ -7,7 +6,6 @@ use crate::{
         snd::MediaPlayer,
         tex::{Assets, },
     },
-    game::{world::{Grid, Palette}},
 };
 
 use super::{Object, health::Health, weapon::WeaponInstance, grenade::Utilities};
