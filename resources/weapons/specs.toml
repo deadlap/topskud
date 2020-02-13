@@ -190,8 +190,8 @@ clip_size = 6
 clips = 8
 damage = 168.5
 penetration = 0.1
-fire_rate = 0.15
-reload_time = 1.95
+fire_rate = 0.85
+reload_time = 2.35
 bullet_type = "Laser"
 bullet_speed = 2200.0
 fire_mode = "semiautomatic"
@@ -206,12 +206,12 @@ slot = "sling"
 
 [auto_laser]
 name = "Auto-Laser"
-clip_size = 60
+clip_size = 40
 clips = 3
 damage = 16.5
 penetration = 0.1
 fire_rate = 0.09
-reload_time = 3.95
+reload_time = 2.95
 bullet_type = "Laser"
 bullet_speed = 2200.0
 fire_mode = "automatic"
