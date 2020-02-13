@@ -52,16 +52,13 @@ impl Bullet<'_> {
         let start = self.obj.pos;
         let d_pos = self.vel * DELTA;
 
-        let mut velocity_decrease: f32 = 950. * DELTA;
+        let mut velocity_decrease: f32 = 220. * DELTA;
 
         if let BulletType::SawBlade = self.weapon.bullet_type {
-            velocity_decrease = 350. * DELTA;
+            velocity_decrease = 120. * DELTA;
             self.obj.rot += 0.08;
         }
         if self.vel.norm() < velocity_decrease {
-            return Hit::Wall;
-        }
-        if self.vel.norm() <= velocity_decrease {
             return Hit::Wall;
         }
         // Check if we've hit a player or an enemy
@@ -110,7 +107,7 @@ impl Bullet<'_> {
 
                 let clip = cast.clip();
                 self.obj.pos += clip -  2. * clip.dot(&to_wall)/to_wall.norm_squared() * to_wall;
-                self.vel -= 2. * self.vel.dot(&to_wall)/to_wall.norm_squared() * to_wall - 2. * self.vel;
+                self.vel -= 2. * self.vel.dot(&to_wall)/to_wall.norm_squared() * to_wall;
                 self.obj.rot = angle_from_vec(self.vel);
             }
             // Hvis bulleten er bouncy, rammer den aldrig en væg.

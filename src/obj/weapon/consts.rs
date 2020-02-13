@@ -1,5 +1,4 @@
-use super::{BulletType, FireMode, Weapon};
-// use super::{FireMode, Weapon};
+use super::{BulletType, FireMode, Weapon, WeaponSlot};
 use crate::util::{sstr, add_sstr, Sstr};
 
 use lazy_static::lazy_static;
@@ -11,13 +10,16 @@ use std::collections::HashMap;
 use std::f32::consts::PI;
 
 lazy_static!{
-    pub static ref WEAPONS: HashMap<String, Weapon> = {
+    pub static ref WEAPONS: HashMap<&'static str, Weapon> = {
         let mut file = File::open("resources/weapons/specs.toml").expect("specs.toml file");
         let mut file_contents = String::new();
         file.read_to_string(&mut file_contents).expect("Reading to succeed");
-
-        let templates: HashMap<String, WeaponTemplate> = toml::from_str(&file_contents).expect("well-defined weapons");
-        templates.into_iter().map(|(k, v)| (k, v.build())).collect()
+        
+        let templates: HashMap<Box<str>, WeaponTemplate> = toml::from_str(&file_contents).expect("well-defined weapons");
+        templates.into_iter().map(|(k, v)| {
+            let k = sstr(k);
+            (k, v.build(k))
+        }).collect()
     };
 }
 
@@ -54,6 +56,7 @@ pub struct WeaponTemplate {
     spray_repeat: usize,
     #[serde(default = "def_speed")]
     bullet_speed: f32,
+    slot: WeaponSlot,
 }
 #[inline]
 const fn def_speed() -> f32 {
@@ -74,7 +77,7 @@ fn def_impact() -> Sstr {
 const DEG2RAD: f32 = PI / 180.;
 
 impl WeaponTemplate {
-    fn build(self) -> Weapon {
+    fn build(self, id: &'static str) -> Weapon {
         let WeaponTemplate {
             name,
             clip_size,
@@ -83,7 +86,6 @@ impl WeaponTemplate {
             penetration,
             fire_rate,
             reload_time,
-            bullet_speed,
             bullet_type,
             fire_mode,
             shot_snd,
@@ -95,16 +97,18 @@ impl WeaponTemplate {
             spray_pattern,
             spray_decay,
             spray_repeat,
+            bullet_speed,
+            slot
         } = self;
 
         Weapon {
+            id,
             name,
             clip_size,
             clips,
             damage,
             penetration,
             fire_rate,
-            bullet_speed,
             bullet_type,
             reload_time,
             fire_mode,
@@ -118,6 +122,8 @@ impl WeaponTemplate {
             spray_pattern: spray_pattern.into_iter().map(|deg| deg * DEG2RAD).collect(),
             spray_decay,
             spray_repeat,
+            bullet_speed,
+            slot
         }
     }
 }

@@ -63,6 +63,13 @@ pub enum FireMode {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum WeaponSlot {
+    Holster,
+    Sling,
+}
+
 impl FireMode {
     #[inline]
     pub fn is_auto(self) -> bool {
@@ -76,6 +83,7 @@ impl FireMode {
 
 #[derive(Debug, Clone)]
 pub struct Weapon {
+    pub id: Sstr,
     pub name: Sstr,
     pub clip_size: NonZeroU16,
     pub clips: NonZeroU16,
@@ -99,6 +107,7 @@ pub struct Weapon {
     pub spray_decay: f32,
     pub spray_repeat: usize,
     pub bullet_speed: f32,
+    pub slot: WeaponSlot,
 }
 
 mod consts;
