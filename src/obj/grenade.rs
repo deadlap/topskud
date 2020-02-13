@@ -185,13 +185,22 @@ impl Utilities {
     }
 }
 
-pub struct GrenadeMaker(f32);
+pub struct GrenadeMaker(pub f32);
 impl GrenadeMaker {
     pub fn make(self, mut obj: Object) -> Grenade {
         let vel = angle_to_vec(obj.rot) * self.0;
         obj.rot = 0.;
         Grenade {
             state: GrenadeState::Fused{fuse: 1.5},
+            vel,
+            obj,
+        }
+    }
+    pub fn make_with_fuse(self, mut obj: Object, fuse: f32) -> Grenade {
+        let vel = angle_to_vec(obj.rot) * self.0;
+        obj.rot = 0.;
+        Grenade {
+            state: GrenadeState::Fused{fuse},
             vel,
             obj,
         }

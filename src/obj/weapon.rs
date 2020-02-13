@@ -17,7 +17,9 @@ use super::{Object, bullet::Bullet};
 pub enum BulletType {
     Common,
     SawBlade,
-    Laser
+    Laser,
+    Explosive,
+    Grenade,
 }
 impl Default for BulletType {
     fn default() -> Self{
@@ -31,6 +33,8 @@ impl BulletType {
             Common => "bullets/bullet",
             SawBlade => "bullets/sawblade",
             Laser => "bullets/laser1",
+            Explosive => "bullets/pineapple",
+            Grenade => "bullets/pineapple",
         }
     }
     /// Returns whether the bullet of this are bouncy
@@ -40,6 +44,8 @@ impl BulletType {
             Common => false,
             SawBlade => true,
             Laser => false,
+            Explosive => false,
+            Grenade => true,
         }
     }
     pub fn piercing(self) -> bool {
@@ -48,6 +54,8 @@ impl BulletType {
             Common => false,
             SawBlade => true,
             Laser => false,
+            Explosive => false,
+            Grenade => false,
         }
     }
 }
@@ -269,7 +277,7 @@ impl<'a> WeaponInstance<'a> {
                     vec![self.next_jerk()]
                 },
             };
-
+            
             Ok(Some(BulletMaker(self.weapon, jerks)))
         } else {
             if self.cur_clip == 0 {

@@ -7,7 +7,7 @@ use crate::{
         Vector2, Point2
     },
     io::tex::PosText,
-    obj::{Object, bullet::Bullet, decal::Decal, pickup::Pickup, player::{Player, WepSlots, ActiveSlot}, enemy::{Enemy, Chaser}, health::Health, weapon::{self, WeaponInstance}, grenade::GrenadeUpdate},
+    obj::{Object, bullet::Bullet, decal::Decal, pickup::Pickup, player::{Player, WepSlots, ActiveSlot}, enemy::{Enemy, Chaser}, health::Health, weapon::{self, WeaponInstance, BulletType}, grenade::{GrenadeUpdate, GrenadeMaker}},
     game::{
         DELTA, State, GameState, StateSwitch, world::{Level, Statistics, World},
         event::{Event::{self, Key, Mouse}, MouseButton, KeyCode, KeyMods}
@@ -198,6 +198,12 @@ impl GameState for Play {
             match hit {
                 Hit::None => (),
                 Hit::Wall => {
+                    // When making the explosive weapon types use this:
+                    // if let BulletType::Explosive = bullet.weapon.bullet_type {
+                    //     let gren = Object::new(bullet.obj.pos);
+                    //     let nade = GrenadeMaker(0.).make_with_fuse(gren,0.);
+                    //     self.world.grenades.push(nade);
+                    // }
                     s.mplayer.play(ctx, &bullet.weapon.impact_snd)?;
                     let dir = angle_to_vec(bullet.obj.rot);
                     bullet.obj.pos += Vector2::new(5.*dir.x.signum(), 5.*dir.y.signum());
@@ -228,13 +234,13 @@ impl GameState for Play {
                     }
                     let enemy = &self.world.enemies[e];
                     s.mplayer.play(ctx, "hit")?;
-
+                    
                     self.world.decals.push(new_blood(bullet.obj.clone()));
                     if enemy.pl.health.is_dead() {
                         s.mplayer.play(ctx, "death")?;
-
+                        
                         let Enemy{pl: Player{wep, obj: Object{pos, ..}, ..}, ..}
-                            = self.world.enemies.remove(e);
+                        = self.world.enemies.remove(e);
                         for wep in wep {
                             self.world.weapons.push(wep.into_drop(pos));
                         }

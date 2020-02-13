@@ -224,3 +224,43 @@ spray_pattern = [-1.3, -2.2, 3.4, -3.2, 2.8, -2.0, 3.0, -1.2, 1.5, -2.8]
 spray_decay = 0.43
 spray_repeat = 4
 slot = "sling"
+
+[rpg]
+name = "Explosions gun"
+clip_size = 1
+clips = 6
+damage = 45.0
+penetration = 0.45
+fire_rate = 0.1
+reload_time = 3.55
+bullet_type = "Explosive"
+bullet_speed = 1600.0
+fire_mode = "boltaction"
+shot_snd = "boom"
+cock_snd = "cock2"
+click_snd = "click_uzi"
+entity_sprite = "weapons/laser_rifle"
+spray_pattern = [-0.5, 0.5, 0.75, -0.75]
+spray_decay = 0.53
+spray_repeat = 2
+slot = "sling"
+
+[nade_launcher]
+name = "Grenade Launcher"
+clip_size = 4
+clips = 6
+damage = 16.0
+penetration = 0.1
+fire_rate = 0.1
+reload_time = 4.35
+bullet_type = "Grenade"
+bullet_speed = 800.0
+fire_mode = "boltaction"
+shot_snd = "throw"
+cock_snd = "cock2"
+click_snd = "click_uzi"
+entity_sprite = "weapons/laser_rifle"
+spray_pattern = [-0.5, 0.5, 0.75, -0.75]
+spray_decay = 0.53
+spray_repeat = 2
+slot = "sling"
