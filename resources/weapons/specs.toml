@@ -164,16 +164,16 @@ spray_repeat = 5
 bullet_speed = 1220
 slot = "sling"
 
-[sawblade_launcher]
+[sawblade]
 name = "Sawblade launcher"
 clip_size = 3
 clips = 5
 damage = 42.5
-penetration = 0.35
+penetration = 0.45
 fire_rate = 0.45
 reload_time = 1.85
 bullet_type = "SawBlade"
-bullet_speed = 500.0
+bullet_speed = 565.0
 fire_mode = "boltaction"
 shot_snd = "throw"
 cock_snd = "cock2"

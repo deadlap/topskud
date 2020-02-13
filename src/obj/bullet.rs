@@ -55,22 +55,11 @@ impl Bullet<'_> {
         let mut velocity_decrease: f32 = 220. * DELTA;
 
         if let BulletType::SawBlade = self.weapon.bullet_type {
-            velocity_decrease = 120. * DELTA;
+            velocity_decrease = 60. * DELTA;
             self.obj.rot += 0.08;
         }
         if self.vel.norm() < velocity_decrease {
             return Hit::Wall;
-        }
-        // Check if we've hit a player or an enemy
-        if Grid::dist_line_circle(start, d_pos, player.obj.pos) <= 16. {
-            self.apply_damage(&mut player.health);
-            return Hit::Player;
-        }
-        for (i, enem) in enemies.iter_mut().enumerate() {
-            if Grid::dist_line_circle(start, d_pos, enem.pl.obj.pos) <= 16. {
-                self.apply_damage(&mut enem.pl.health);
-                return Hit::Enemy(i);
-            }
         }
 
         // Decrease velocity after damage could've been dealt
