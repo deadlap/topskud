@@ -134,14 +134,15 @@ impl Grenade {
         }
 
         let closest_p = Grid::closest_point_of_line_to_circle(start, d_pos, player.obj.pos);
-        let r_player = player.obj.pos - closest_p;
-        if r_player.norm() <= 16. {
-            *vel -= 2. * vel.dot(&r_player)/r_player.norm_squared() * r_player;
-            let clip = (start + d_pos) - closest_p;
+        // Removed so grenade dont dissapear in walls.
+        // let r_player = player.obj.pos - closest_p;
+        // if r_player.norm() <= 16. {
+        //     *vel -= 2. * vel.dot(&r_player)/r_player.norm_squared() * r_player;
+        //     let clip = (start + d_pos) - closest_p;
 
-            obj.pos = closest_p + clip -  2. * clip.dot(&r_player)/r_player.norm_squared()*r_player;
-            return GrenadeUpdate::None;
-        }
+        //     obj.pos = closest_p + clip -  2. * clip.dot(&r_player)/r_player.norm_squared()*r_player;
+        //     return GrenadeUpdate::None;
+        // }
         for enem in enemies.iter_mut() {
             let closest_e = Grid::closest_point_of_line_to_circle(start, d_pos, enem.pl.obj.pos);
             let r_enemy = enem.pl.obj.pos - closest_e;
@@ -193,7 +194,7 @@ impl Utilities {
             self.grenades -= 1;
 
             mplayer.play(ctx, "throw")?;
-            Ok(Some(GrenadeMaker(620.)))
+            Ok(Some(GrenadeMaker(540.)))
         } else {
             mplayer.play(ctx, "cock")?;
             Ok(None)

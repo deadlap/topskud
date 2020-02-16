@@ -13,12 +13,12 @@ use ggez::{Context, GameResult};
 
 use super::{Object, bullet::Bullet};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum BulletType {
     Common,
     SawBlade,
     Laser,
-    Explosive,
+    Rocket,
     Grenade,
 }
 impl Default for BulletType {
@@ -33,7 +33,7 @@ impl BulletType {
             Common => "bullets/bullet",
             SawBlade => "bullets/sawblade",
             Laser => "bullets/laser1",
-            Explosive => "bullets/pineapple",
+            Rocket => "bullets/rocket",
             Grenade => "bullets/pineapple",
         }
     }
@@ -44,7 +44,7 @@ impl BulletType {
             Common => false,
             SawBlade => true,
             Laser => false,
-            Explosive => false,
+            Rocket => false,
             Grenade => true,
         }
     }
@@ -54,7 +54,7 @@ impl BulletType {
             Common => false,
             SawBlade => true,
             Laser => false,
-            Explosive => false,
+            Rocket => false,
             Grenade => false,
         }
     }
@@ -277,7 +277,6 @@ impl<'a> WeaponInstance<'a> {
                     vec![self.next_jerk()]
                 },
             };
-            
             Ok(Some(BulletMaker(self.weapon, jerks)))
         } else {
             if self.cur_clip == 0 {

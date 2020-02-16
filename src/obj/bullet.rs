@@ -6,7 +6,9 @@ use crate::{
         DELTA,
         world::{Grid, Palette},
     },
-    io::tex::{Assets, }
+    io::tex::{Assets, },
+    obj::{grenade::GrenadeMaker},
+
 };
 use super::{Object, player::Player, enemy::Enemy, health::Health, weapon::{Weapon, BulletType}};
 

@@ -198,13 +198,14 @@ impl GameState for Play {
 
             match hit {
                 Hit::None => (),
+                _ if bullet.weapon.bullet_type == BulletType::Rocket => {
+                    let gren = Object::new(bullet.obj.pos - angle_to_vec(bullet.obj.rot));
+                    let nade = GrenadeMaker(0.).make_with_fuse(gren,0.);
+                    self.world.grenades.push(nade);
+                    // Du skal huske at slette bulletten bagefter, et òg @deadlap
+                    deads.push(i);
+                }
                 Hit::Wall => {
-                    // When making the explosive weapon types use this:
-                    // if let BulletType::Explosive = bullet.weapon.bullet_type {
-                    //     let gren = Object::new(bullet.obj.pos);
-                    //     let nade = GrenadeMaker(0.).make_with_fuse(gren,0.);
-                    //     self.world.grenades.push(nade);
-                    // }
                     s.mplayer.play(ctx, &bullet.weapon.impact_snd)?;
                     let dir = angle_to_vec(bullet.obj.rot);
                     bullet.obj.pos += Vector2::new(5.*dir.x.signum(), 5.*dir.y.signum());
@@ -499,8 +500,14 @@ impl GameState for Play {
                         let mut bul = Object::new(pos);
                         bul.rot = self.world.player.obj.rot;
 
-                        for bullet in bm.make(bul) {
-                            self.world.bullets.push(bullet);
+                        if wep.weapon.bullet_type == BulletType::Grenade {
+                            bul.pos -= 8. * angle_to_vec(self.world.player.obj.rot);
+                            let nade = GrenadeMaker(wep.weapon.bullet_speed).make_with_fuse(bul, 0.5);
+                            self.world.grenades.push(nade);
+                        } else {
+                            for bullet in bm.make(bul) {
+                                self.world.bullets.push(bullet);
+                            }
                         }
                     }
                 } else {
@@ -538,7 +545,7 @@ impl GameState for Play {
             }
             Mouse(MouseButton::Right) => {
                 if let Some(gm) = self.world.player.wep.utilities.throw_grenade(ctx, &mut s.mplayer).unwrap() {
-                    let pos = self.world.player.obj.pos + 20. * angle_to_vec(self.world.player.obj.rot);
+                    let pos = self.world.player.obj.pos + 12. * angle_to_vec(self.world.player.obj.rot);
                     let mut gren = Object::new(pos);
                     gren.rot = self.world.player.obj.rot;
 
