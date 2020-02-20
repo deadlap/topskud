@@ -412,7 +412,8 @@ impl GameState for Play {
         for grenade in &self.world.grenades {
             grenade.draw(ctx, &s.assets)?;
         }
-
+        self.world.player.draw_visible_area(ctx, 412.,&self.world.palette, &self.world.grid)?;
+        
         Ok(())
     }
     fn draw_hud(&mut self, s: &State, ctx: &mut Context) -> GameResult<()> {

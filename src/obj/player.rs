@@ -1,6 +1,7 @@
 use std::{option::IntoIter, iter::{Chain, IntoIterator}};
 
-use ggez::{Context, GameResult, graphics::{self, WHITE, Color}};
+use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, BlendMode, set_blend_mode, MeshBuilder, DrawMode, DrawParam, FillOptions}};
+use std::f32::consts::PI;
 
 use crate::{
     util::{Point2, angle_to_vec},
@@ -8,9 +9,12 @@ use crate::{
         snd::MediaPlayer,
         tex::{Assets, },
     },
+    game::{world::{Grid, Palette}},
 };
 
 use super::{Object, health::Health, weapon::{Weapon, WeaponInstance, WeaponSlot}, grenade::Utilities};
+
+pub const VISIBILITY: f32 = ::std::f32::consts::FRAC_PI_4;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
