@@ -1,6 +1,6 @@
 use std::{option::IntoIter, iter::{Chain, IntoIterator}};
 
-use ggez::{Context, GameResult, graphics::{self, WHITE, Color, Mesh, BlendMode, set_blend_mode, MeshBuilder, DrawMode, DrawParam, FillOptions}};
+use ggez::{Context, GameResult, graphics::{self, Drawable, WHITE, Color, Mesh, BlendMode, MeshBuilder, DrawMode, DrawParam, FillOptions}};
 use std::f32::consts::PI;
 
 use crate::{
@@ -220,23 +220,33 @@ impl Player {
         screen.push(Point2::new(0., 0.));
         screen.push(Point2::new(lvl_width, 0.));
         screen.push(Point2::new(lvl_width, lvl_height));
+        let mut fov = Vec::new();
+        fov.push(self.obj.pos);
         for i in 0..(angle as u16)/2{
             let cast = grid.ray_cast(palette, pos, angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*length, true);
             let current_point = cast.into_point()+angle_to_vec((start_angle + (i*2) as f32)*PI/180.)*15.;
-            if i == 0 {fpoint = current_point;}
-            if (current_point.y < pos.y || current_point.x < pos.x) && !p_added && i == 0 {
-                p_added = true;
-                screen.push(pos);
-                fpoint = pos;
-            }
-            screen.push(current_point);
+            fov.push(current_point);
+            // if i == 0 {fpoint = current_point;}
+            // if (current_point.y < pos.y || current_point.x < pos.x) && !p_added && i == 0 {
+            //     p_added = true;
+            //     screen.push(pos);
+            //     fpoint = pos;
+            // }
+            // screen.push(current_point);
         }
-        screen.push(pos);
-        screen.push(fpoint);
-        screen.push(Point2::new(lvl_width, lvl_height));
-        screen.push(Point2::new(0., lvl_height));
-        let mesh_screen = Mesh::new_polygon(ctx, DrawMode::Fill(FillOptions::even_odd()), &screen, Color::from_rgba(4, 6, 6, 255))?;
-        graphics::draw(ctx, &mesh_screen, DrawParam::default())
+        fov.push(self.obj.pos);
+        // screen.push(pos);
+        // screen.push(fpoint);
+        // screen.push(Point2::new(lvl_width, lvl_height));
+        // screen.push(Point2::new(0., lvl_height));
+        let mut mesh_fov = Mesh::new_polygon(ctx, DrawMode::Fill(FillOptions::even_odd()), &fov, Color::new(1.0, 1.0, 1.0, 0.5))?;//Color::from_rgba(0, 0, 0, 220))?;
+        mesh_fov.set_blend_mode(Some(BlendMode::Add));
+        let mut mesh_screen = Mesh::new_polygon(ctx, DrawMode::Fill(FillOptions::even_odd()), &screen, Color::new(0.0, 0.0, 0.0, 0.99))?;//Color::from_rgba(4, 6, 6, 254))?;
+        mesh_screen.set_blend_mode(Some(BlendMode::Replace));
+        graphics::draw(ctx, &mesh_fov, DrawParam::default())?;
+        // graphics::draw(ctx, &mesh_screen, DrawParam::default())?;
+        // graphics::present(ctx)
+        Ok(())
     }
 
     pub fn update(&mut self, ctx: &mut Context, mplayer: &mut MediaPlayer) -> GameResult<()> {
